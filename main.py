@@ -1,13 +1,16 @@
+from http import client
 import tkinter as tk
 from tkinter import ttk
 import threading
+from xml.parsers.expat import model
 import pyperclip
 import keyboard
-from google import genai
 import ctypes
+import google.generativeai as genai
+import os
 
-# setx GEMINI_API_KEY "colle-ta-clé-ici"`.
-client = genai.Client()
+# Configuration de l'API
+genai.configure(api_key="") #API KEY ICI
 
 # Modèles disponibles
 MODELS = [
@@ -282,11 +285,8 @@ class OverlayApp:
             self.root.after(0, lambda m=current_model: self.update_status(f" {m}..."))
             
             try:
-                response = client.models.generate_content(
-                    model=current_model,
-                    contents=prompt
-                )
-                
+                model = genai.GenerativeModel(current_model)
+                response = model.generate_content(prompt)
                 answer = response.text
                 self.root.after(0, lambda: self.set_response(answer))
                 self.root.after(0, lambda m=current_model: self.update_status(f" {m}"))
