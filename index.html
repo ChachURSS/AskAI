@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - Modèle OSI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 40px;
+            transition: background-color 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .quiz-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 700px;
+            width: 90%;
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+
+        .quiz-container h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+        }
+
+        .question {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-size: 1.3rem;
+            line-height: 1.6;
+        }
+
+        .answer-area {
+            margin-top: 20px;
+        }
+
+        .answer-area textarea {
+            width: 100%;
+            height: 200px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            resize: none;
+            transition: border-color 0.3s;
+        }
+
+        .answer-area textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* QCM Styles */
+        .qcm-section {
+            margin-top: 40px;
+            text-align: left;
+        }
+
+        .qcm-section h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .qcm-question {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .qcm-question p {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .qcm-option {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            margin: 8px 0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .qcm-option:hover {
+            background: #e8f4fd;
+            border-color: #667eea;
+        }
+
+        .qcm-option input[type="radio"] {
+            margin-right: 12px;
+            transform: scale(1.3);
+            cursor: pointer;
+        }
+
+        .qcm-option label {
+            cursor: pointer;
+            flex: 1;
+        }
+
+        /* Écran rouge quand on quitte le plein écran */
+        .cheating-detected {
+            background-color: #e74c3c !important;
+        }
+
+        .cheating-detected .quiz-container {
+            display: none;
+        }
+
+        .warning-message {
+            display: none;
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .cheating-detected .warning-message {
+            display: block;
+        }
+
+        /* Écran de démarrage */
+        .start-screen {
+            background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .start-screen h2 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .start-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .start-btn:hover {
+            background: #2ecc71;
+            transform: scale(1.05);
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="start-screen" id="startScreen">
+        <h2>📝 Quiz - Réseaux Informatiques</h2>
+        <p style="margin-bottom: 30px;">Ce quiz se déroule en mode plein écran.<br>Ne quittez pas le plein écran pendant l'examen.</p>
+        <button class="start-btn" onclick="startQuiz()">Commencer le Quiz</button>
+    </div>
+
+    <div class="quiz-container hidden" id="quizContainer">
+        <h1>📚 Question de Réseaux</h1>
+        <div class="question">
+            <strong>Question :</strong><br><br>
+            Quelles sont les 7 couches du modèle OSI ?<br>
+            Citez-les dans l'ordre (de la couche 1 à la couche 7) et donnez une brève description de chacune.
+        </div>
+        <div class="answer-area">
+            <textarea placeholder="Écrivez votre réponse ici..." id="answer"></textarea>
+        </div>
+
+        <!-- QCM Section -->
+        <div class="qcm-section">
+            <h2>📋 Questions à Choix Multiples</h2>
+
+            <!-- Question 1 -->
+            <div class="qcm-question">
+                <p>1. Quelle couche du modèle OSI est responsable de l'adressage IP ?</p>
+                <div class="qcm-option">
+                    <input type="radio" name="q1" id="q1a" value="a">
+                    <label for="q1a">A) Couche Liaison de données</label>
+                </div>
+                <div class="qcm-option">
+                    <input type="radio" name="q1" id="q1b" value="b">
+                    <label for="q1b">B) Couche Transport</label>
+                </div>
+                <div class="qcm-option">
+                    <input type="radio" name="q1" id="q1c" value="c">
+                    <label for="q1c">C) Couche Réseau</label>
+                </div>
+                <div class="qcm-option">
+                    <input type="radio" name="q1" id="q1d" value="d">
+                    <label for="q1d">D) Couche Application</label>
+                </div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="qcm-question">
+                <p>2. Quel protocole fonctionne au niveau de la couche Transport ?</p>
+                <div class="qcm-option">
+                    <input type="radio" name="q2" id="q2a" value="a">
+                    <label for="q2a">A) HTTP</label>
+                </div>
+                <div class="qcm-option">
+                    <input type="radio" name="q2" id="q2b" value="b">
+                    <label for="q2b">B) IP</label>
+                </div>
+                <div class="qcm-option">
+                    <input type="radio" name="q2" id="q2c" value="c">
+                    <label for="q2c">C) TCP</label>
+                </div>
+                <div class="qcm-option">
+                    <input type="radio" name="q2" id="q2d" value="d">
+                    <label for="q2d">D) Ethernet</label>
+                </div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="qcm-question">
+                <p>3. Quelle est la couche la plus haute du modèle OSI ?</p>
+                <div class="qcm-option">
+                    <input type="radio" name="q3" id="q3a" value="a">
+                    <label for="q3a">A) Couche Présentation</label>
+                </div>
+                <div class="qcm-option">
+                    <input type="radio" name="q3" id="q3b" value="b">
+                    <label for="q3b">B) Couche Session</label>
+                </div>
+                <div class="qcm-option">
+                    <input type="radio" name="q3" id="q3c" value="c">
+                    <label for="q3c">C) Couche Application</label>
+                </div>
+                <div class="qcm-option">
+                    <input type="radio" name="q3" id="q3d" value="d">
+                    <label for="q3d">D) Couche Transport</label>
+                </div>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="qcm-question">
+                <p>4. L'adresse MAC est utilisée à quelle couche ?</p>
+                <div class="qcm-option">
+                    <input type="radio" name="q4" id="q4a" value="a">
+                    <label for="q4a">A) Couche Physique</label>
+                </div>
+                <div class="qcm-option">
+                    <input type="radio" name="q4" id="q4b" value="b">
+                    <label for="q4b">B) Couche Liaison de données</label>
+                </div>
+                <div class="qcm-option">
+                    <input type="radio" name="q4" id="q4c" value="c">
+                    <label for="q4c">C) Couche Réseau</label>
+                </div>
+                <div class="qcm-option">
+                    <input type="radio" name="q4" id="q4d" value="d">
+                    <label for="q4d">D) Couche Transport</label>
+                </div>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="qcm-question">
+                <p>5. Quel équipement réseau travaille principalement au niveau de la couche 3 ?</p>
+                <div class="qcm-option">
+                    <input type="radio" name="q5" id="q5a" value="a">
+                    <label for="q5a">A) Hub</label>
+                </div>
+                <div class="qcm-option">
+                    <input type="radio" name="q5" id="q5b" value="b">
+                    <label for="q5b">B) Switch</label>
+                </div>
+                <div class="qcm-option">
+                    <input type="radio" name="q5" id="q5c" value="c">
+                    <label for="q5c">C) Routeur</label>
+                </div>
+                <div class="qcm-option">
+                    <input type="radio" name="q5" id="q5d" value="d">
+                    <label for="q5d">D) Répéteur</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="warning-message" id="warningMessage">
+        ⚠️ TRICHE DÉTECTÉE ⚠️<br><br>
+        Vous avez quitté le mode plein écran !<br>
+        Veuillez contacter votre examinateur.
+    </div>
+
+    <script>
+        let quizStarted = false;
+        let isFullscreen = false;
+
+        function startQuiz() {
+            const elem = document.documentElement;
+            
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+        }
+
+        // Écouter les changements de plein écran
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('msfullscreenchange', handleFullscreenChange);
+
+        function handleFullscreenChange() {
+            const isCurrentlyFullscreen = document.fullscreenElement || 
+                                          document.webkitFullscreenElement || 
+                                          document.msFullscreenElement;
+
+            if (isCurrentlyFullscreen) {
+                // On entre en plein écran - démarrer le quiz
+                isFullscreen = true;
+                if (!quizStarted) {
+                    quizStarted = true;
+                    document.getElementById('startScreen').classList.add('hidden');
+                    document.getElementById('quizContainer').classList.remove('hidden');
+                    document.body.style.background = 'linear-gradient(135deg, #74b9ff 0%, #a29bfe 100%)';
+                }
+            } else {
+                // On quitte le plein écran
+                if (quizStarted && isFullscreen) {
+                    // Afficher l'écran rouge
+                    document.body.classList.add('cheating-detected');
+                    isFullscreen = false;
+                }
+            }
+        }
+
+        // Empêcher certaines touches
+        document.addEventListener('keydown', function(e) {
+            if (quizStarted) {
+                // Bloquer F11, Escape (déjà géré par le navigateur pour fullscreen)
+                if (e.key === 'F11') {
+                    e.preventDefault();
+                }
+                // Bloquer Alt+Tab (on ne peut pas vraiment le bloquer, mais on détecte)
+                if (e.altKey && e.key === 'Tab') {
+                    e.preventDefault();
+                }
+            }
+        });
+
+        // Détecter quand l'utilisateur quitte la page (Alt+Tab, clic ailleurs, etc.)
+        document.addEventListener('visibilitychange', function() {
+            if (quizStarted && document.hidden) {
+                // L'utilisateur a quitté l'onglet/fenêtre
+                triggerCheatingDetected();
+            }
+        });
+
+        // Détecter la perte de focus de la fenêtre
+        window.addEventListener('blur', function() {
+            if (quizStarted && isFullscreen) {
+                triggerCheatingDetected();
+            }
+        });
+
+        function triggerCheatingDetected() {
+            document.body.classList.add('cheating-detected');
+            isFullscreen = false;
+        }
+    </script>
+</body>
+</html>
