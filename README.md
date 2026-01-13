@@ -1,5 +1,6 @@
 # AskAI
 - Logiciel copilot pour la vie de tout les jours
+- L'index.html constitue un site de test
 - Regarder les releases, la v1 consitue le logiciel normal, si GenAI ne fonctionne pas alors vous pouvez installer le fix dans release
 
 ## Comment utiliser
