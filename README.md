@@ -1,5 +1,6 @@
 # AskAI
 - Logiciel copilot pour la vie de tout les jours
+- Regarder les releases, la v1 consitue le logiciel normal, si GenAI ne fonctionne pas alors vous pouvez installer le fix dans release
 
 ## Comment utiliser
 -Lancer le code.
